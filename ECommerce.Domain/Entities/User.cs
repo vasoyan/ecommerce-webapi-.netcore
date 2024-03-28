@@ -10,7 +10,7 @@ public partial class User : BaseEntity
 
     public int RoleId { get; set; }
 
-    public string JwtToken { get; set; } = null!;
+    public string? JwtToken { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

@@ -6,5 +6,5 @@ public partial class RoleVM : BaseViewModel
 
     //public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
 
-    public virtual ICollection<UserVM> Users { get; set; } = new List<UserVM>();
+    // public virtual ICollection<UserVM> Users { get; set; } = new List<UserVM>();
 }

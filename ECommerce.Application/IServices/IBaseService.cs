@@ -38,7 +38,7 @@ namespace ECommerce.Application.IServices
         /// Makes soft deletion the entity by it's identifier. Sets it's status to inactive. Does not delete the entity from database.
         /// </summary>
         /// <param name="id">Identifier</param>
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
 
         /// <summary>
         /// Determines whether a sequence contains any elements.

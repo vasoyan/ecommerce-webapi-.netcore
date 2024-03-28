@@ -56,6 +56,7 @@ namespace ECommerce.Infrastructure.Repositories
 
         public async Task DeleteAsync(T entity)
         {
+            _context.Remove(entity);
             //Delete operation will be made by changing entity's status in service layer.
             await _context.SaveChangesAsync();
         }

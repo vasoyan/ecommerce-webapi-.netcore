@@ -28,7 +28,8 @@ namespace ECommerce.Application.Mappings
             CreateMap<Role, RoleVM>();
 
             CreateMap<UserDTO, User>();
-            CreateMap<User, UserVM>();
+            CreateMap<User, UserVM>().ReverseMap();
+
         }
     }
 }

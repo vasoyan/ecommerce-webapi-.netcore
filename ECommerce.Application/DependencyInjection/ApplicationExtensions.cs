@@ -8,7 +8,8 @@ namespace ECommerce.Application.DependencyInjection
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services
+            services.AddScoped<ITokenService, TokenService>()
+                .AddScoped<IRoleService, RoleService>()
                 .AddScoped<IUserService, UserService>();
 
             // Additional application-related service registrations

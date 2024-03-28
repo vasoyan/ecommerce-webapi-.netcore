@@ -1,10 +1,12 @@
-﻿namespace ECommerce.Application.Models.Helpers
+﻿using System.Net;
+
+namespace ECommerce.Application.Models.Helpers
 {
     public class ApiResponse<T>
     {
         public bool Success { get; set; }
         public T? Data { get; set; }
-        public string? ErrorMessage { get; set; }
+        public string? Message { get; set; }
         public int StatusCode { get; set; }
 
         public ApiResponse(T data, int statusCode = 200)
@@ -14,17 +16,17 @@
             StatusCode = statusCode;
         }
 
-        public ApiResponse(string errorMessage, int statusCode = 200)
+        public ApiResponse(string message, int statusCode = 200)
         {
-            Success = false;
-            ErrorMessage = errorMessage;
+            Success = statusCode == (int)HttpStatusCode.OK;
+            Message = message;
             StatusCode = statusCode;
         }
 
-        public ApiResponse(Exception exception, int statusCode = 200)
+        public ApiResponse(Exception? exception, int statusCode = 200)
         {
             Success = false;
-            ErrorMessage = exception.Message;
+            Message = exception?.Message;
             StatusCode = statusCode;
         }
     }

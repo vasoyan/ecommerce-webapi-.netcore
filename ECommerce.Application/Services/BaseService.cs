@@ -46,10 +46,18 @@ namespace ECommerce.Application.Services
             return _mapper.Map<TVm>(result);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            T entity = await _repository.GetByIdAsync(id);
-            await _repository.UpdateAsync(entity);
+            T? entity = await _repository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                await _repository.DeleteAsync(entity);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
