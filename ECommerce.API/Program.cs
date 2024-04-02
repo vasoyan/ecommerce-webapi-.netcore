@@ -4,7 +4,6 @@ using ECommerce.Application.Models.VMs;
 using ECommerce.Infrastructure.Context;
 using ECommerce.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,9 +22,6 @@ builder.Services.AddControllers()
                     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                     x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-
-
-
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -56,6 +52,7 @@ builder.Services.AddDbContext<ECommerceDbContext>(o =>
 {
     o.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionStrings"));
     o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    o.EnableSensitiveDataLogging();
 });
 
 #region Moduler dependancies Resolver

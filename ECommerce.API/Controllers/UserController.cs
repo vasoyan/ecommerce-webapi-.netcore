@@ -12,16 +12,11 @@ namespace ECommerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController(IUserService userServices, ITokenService tokenService, ILogger<UserController> logger) : ControllerBase
     {
-        private readonly IUserService _userServices;
-        private readonly ILogger<UserController> _logger;
-
-        public UserController(IUserService userServices, ILogger<UserController> logger)
-        {
-            _userServices = userServices ?? throw new ArgumentNullException(nameof(userServices));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        private readonly IUserService _userServices = userServices ?? throw new ArgumentNullException(nameof(userServices));
+        private readonly ITokenService _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+        private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserVM>>> GetAllByFilterWithPagedList(int pageIndex = 1, int pageSize = 20)
@@ -77,7 +72,7 @@ namespace ECommerce.API.Controllers
                     _logger.LogInformation(Constants.MODEL_STATE_NOT_VALID);
                     return BadRequest(new ApiResponse<object>(Constants.MODEL_STATE_NOT_VALID, (int)HttpStatusCode.BadRequest));
                 }
-
+                userDTO.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.PasswordHash);
                 var result = await _userServices.SaveAsync(userDTO);
 
                 if (result != null)
@@ -107,6 +102,7 @@ namespace ECommerce.API.Controllers
                 if (userData == null)
                     return NotFound(new ApiResponse<UserVM>(Constants.DATA_NOT_FOUND_MESSAGE, (int)HttpStatusCode.NotFound));
 
+                userDTO.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.PasswordHash);
                 var result = await _userServices.UpdateAsync(userDTO);
                 if (result != null)
                     return Ok(new ApiResponse<UserVM>(result, (int)HttpStatusCode.OK));
@@ -158,6 +154,8 @@ namespace ECommerce.API.Controllers
                     return Unauthorized(new ApiResponse<object>(Constants.UNAUTHORIZED_MESSAGE, (int)HttpStatusCode.Unauthorized));
                 }
 
+                setTokenCookie(user?.RefreshTokens.FirstOrDefault()?.Token);
+
                 // Password is valid, return user data or JWT token
                 // For simplicity, assuming the user object is mapped to UserVM
                 return Ok(new ApiResponse<UserVM>(user, (int)HttpStatusCode.OK));
@@ -189,26 +187,46 @@ namespace ECommerce.API.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshTokenAsync(RefreshTokenDTO refreshTokenDTO)
+        public async Task<ActionResult<string>> RefreshTokenAsync()
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+                return Unauthorized(new ApiResponse<object>(Constants.INVALID_TOKEN_MESSAGE, (int)HttpStatusCode.Unauthorized));
+
             // Validate the refresh token
-            var principal = _tokenService.GetPrincipalFromExpiredToken(refreshTokenDTO.Token);
-            var email = principal.Identity.Email; // Extract username from the token
+            var refreshTokenData = await _userServices.RefreshTokenAsync(refreshToken);
 
-            // Retrieve the user from the database based on the username
-            var user = await _userServices.GetUserByEmailAsync(email);
-
-            if (user == null || user.RefreshToken != refreshTokenDTO.Token || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (refreshTokenData != null)
             {
-                // If the user is not found or the refresh token is invalid or expired, return Unauthorized
-                return Unauthorized();
+                setTokenCookie(refreshTokenData?.Token);
+
+                // Return the new access token
+                return Ok(new ApiResponse<object>(new { token = refreshTokenData.User.JwtToken }, (int)HttpStatusCode.OK));
             }
+            else
+            {
+                return Unauthorized(new ApiResponse<object>(Constants.INVALID_TOKEN_MESSAGE, (int)HttpStatusCode.Unauthorized));
+            }
+        }
 
-            // Issue a new access token with a new expiration time
-            var newAccessToken = _tokenService.GenerateAccessToken(user);
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private void setTokenCookie(string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", token, cookieOptions);
+        }
 
-            // Return the new access token
-            return Ok(newAccessToken);
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private string ipAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+            else
+                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
 
     }

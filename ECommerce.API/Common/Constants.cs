@@ -9,5 +9,6 @@
         public const string MODEL_STATE_NOT_VALID = "The request contains invalid data!";
         public const string DELETE_MESSAGE = "Data deleted successfully!";
         public const string UNAUTHORIZED_MESSAGE = "Login failed. The email or password you entered is incorrect!";
+        public const string INVALID_TOKEN_MESSAGE = "Invalid Token!";
     }
 }

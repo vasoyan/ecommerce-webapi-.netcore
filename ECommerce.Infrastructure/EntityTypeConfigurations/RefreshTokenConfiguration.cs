@@ -9,18 +9,16 @@ namespace ECommerce.Infrastructure.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
             builder.ToTable("RefreshTokens");
-            
+
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.UserId);
-            
             builder.Property(e => e.ExpiryDateTime).HasColumnType("datetime");
 
-            builder.HasOne(d => d.User).WithOne(p => p.RefreshToken)
-                .HasForeignKey<RefreshToken>(d => d.UserId)
+            builder.HasOne(d => d.User)
+                .WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__RefreshTo__UserI__2F10007B");
-
+                .HasConstraintName("FK_RefreshTokens_Users");
         }
     }
 }

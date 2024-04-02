@@ -15,20 +15,23 @@ namespace ECommerce.Application.Mappings
             CreateMap<CategoryDTO, Category>();
             CreateMap<Category, CategoryVM>();
 
-            CreateMap<PermissionDTO , Permission>();
+            CreateMap<PermissionDTO, Permission>();
             CreateMap<Permission, PermissionVM>();
 
             CreateMap<ProductDTO, Product>();
             CreateMap<Product, ProductVM>();
 
-            CreateMap<RefreshTokenDTO, RefreshToken>();
-            CreateMap<RefreshToken, RefreshTokenVM>();
+            CreateMap<RefreshTokenDTO, RefreshToken>().ReverseMap();
+            CreateMap<RefreshToken, RefreshTokenVM>()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ReverseMap();
 
-            CreateMap<RoleDTO, Role>();
-            CreateMap<Role, RoleVM>();
+            CreateMap<RoleDTO, Role>().ReverseMap();
+            CreateMap<Role, RoleVM>().ReverseMap();
 
-            CreateMap<UserDTO, User>();
+            CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<User, UserVM>().ReverseMap();
+            CreateMap<UserVM, UserDTO>().ReverseMap();
 
         }
     }

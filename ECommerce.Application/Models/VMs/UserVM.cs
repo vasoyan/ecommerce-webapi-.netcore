@@ -13,8 +13,8 @@ public partial class UserVM : BaseViewModel
     public string JwtToken { get; set; } = null!;
 
     //public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-    public virtual RefreshTokenVM? RefreshToken { get; set; }
+    // public RefreshTokenVM? RefreshToken { get; set; }
+    public virtual ICollection<RefreshTokenVM> RefreshTokens { get; set; } = new List<RefreshTokenVM>();
 
     public virtual RoleVM Role { get; set; } = null!;
 }

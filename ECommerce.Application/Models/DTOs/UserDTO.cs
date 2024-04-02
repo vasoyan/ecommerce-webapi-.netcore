@@ -10,22 +10,14 @@ public partial class UserDTO : BaseDTO
     [Required]
     public string Email { get; set; } = null!;
 
-    private string _passwordHash;
     [Required]
-    public string PasswordHash
-    {
-        get => _passwordHash;
-        set
-        {
-            _passwordHash = BCrypt.Net.BCrypt.HashPassword(value);
-        }
-    }
+    public string PasswordHash { get; set; }
 
     public int RoleId { get; set; }
-    
+
     // bool isPasswordValid = BCrypt.Net.BCrypt.Verify(enteredPassword, storedEncryptedPassword);
 
-    // public string JwtToken { get; set; } = null!;
+    public string JwtToken { get; set; } = null!;
 
     //public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

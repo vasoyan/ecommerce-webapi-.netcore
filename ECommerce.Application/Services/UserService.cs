@@ -4,18 +4,26 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Models.VMs;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.IRepositories;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace ECommerce.Application.Services
 {
-    public class UserService(IUserRepository userRepository, ITokenService tokenService, IMapper mapper) : BaseService<User, UserDTO, UserVM>(userRepository, mapper), IUserService
+    public class UserService(IUserRepository userRepository, ITokenService tokenService,
+        IRefreshTokenRepository refreshTokenRepository,
+        IRefreshTokenService refreshTokenService,
+        IOptions<JwtTokenSettings> jwtTokenSettings,
+        IMapper mapper)
+        : BaseService<User, UserDTO, UserVM>(userRepository, mapper), IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ITokenService _tokenService = tokenService;
+        private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
+        private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
+        private readonly JwtTokenSettings _jwtTokenSettings = jwtTokenSettings.Value;
         private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<UserVM>?> GetFilteredPagedListAsync(int pageIndex = 1, int pageSize = 20)
@@ -39,10 +47,12 @@ namespace ECommerce.Application.Services
         public async Task<UserVM?> GetUserByEmailAsync(string email)
         {
             Expression<Func<User, bool>> filter = u => u.Email.Trim() == email.Trim();
+            Func<IQueryable<User>, IIncludableQueryable<User, object>> includes = q => q.Include(p => p.RefreshTokens).Include(p => p.Role);
 
             var userVM = await _userRepository.GetFilteredFirstOrDefaultAsync(
                 select: x => _mapper.Map<UserVM>(x),
-                where: filter);
+                where: filter,
+                include: includes);
 
             return userVM;
         }
@@ -58,11 +68,18 @@ namespace ECommerce.Application.Services
                 // Assuming you want to return null if the password is not valid
                 if (isPasswordValid)
                 {
-                    var token = _tokenService.GenerateAccessToken(userVM);
-                    
-                    userVM.JwtToken = token;
+                    userVM.JwtToken = _tokenService.GenerateAccessToken(userVM);
+                    await UpdateAsync(_mapper.Map<UserDTO>(userVM));
 
-                   var updateUser = _userRepository.UpdateAsync(_mapper.Map<User>(userVM));
+                    RefreshTokenDTO refreshTokenDTO = new()
+                    {
+                        Token = _tokenService.GenerateRefreshToken(),
+                        UserId = userVM.Id,
+                        ExpiryDateTime = DateTime.UtcNow.AddMinutes(_jwtTokenSettings.RefreshTokenTTL),
+                    };
+
+                    // Generate refresh token
+                    userVM.RefreshTokens.Add(await _refreshTokenService.SaveAsync(refreshTokenDTO));
 
                     return userVM;
                 }
@@ -74,6 +91,37 @@ namespace ECommerce.Application.Services
 
             return userVM;
 
+        }
+
+        public async Task<RefreshTokenVM?> RefreshTokenAsync(string token)
+        {
+            var refreshTokenData = await _refreshTokenService.GetFilteredFirstOrDefaultAsync(token);
+
+            if (refreshTokenData != null)
+            {
+                UserVM userVM = await GetByIdAsync(refreshTokenData.UserId);
+                ClaimsPrincipal claimsPrincipal = _tokenService.GetPrincipalFromExpiredToken(userVM.JwtToken);
+                if (claimsPrincipal.Claims.FirstOrDefault().Subject.IsAuthenticated)
+                {
+                    userVM.JwtToken = _tokenService.GenerateAccessToken(userVM);
+                    await UpdateAsync(_mapper.Map<UserDTO>(userVM));
+
+                    RefreshTokenDTO refreshTokenDTO = new()
+                    {
+                        Token = _tokenService.GenerateRefreshToken(),
+                        UserId = userVM.Id,
+                        ExpiryDateTime = DateTime.UtcNow.AddMinutes(_jwtTokenSettings.RefreshTokenTTL),
+                    };
+
+                    // Generate refresh token
+                    userVM.RefreshTokens.Add(await _refreshTokenService.SaveAsync(refreshTokenDTO));
+
+                    refreshTokenData.User = userVM;
+                    return refreshTokenData;
+                }
+            }
+
+            return null;
         }
 
     }

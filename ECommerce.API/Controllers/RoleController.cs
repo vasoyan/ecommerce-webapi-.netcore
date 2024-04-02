@@ -3,7 +3,6 @@ using ECommerce.Application.IServices;
 using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Models.Helpers;
 using ECommerce.Application.Models.VMs;
-using ECommerce.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 

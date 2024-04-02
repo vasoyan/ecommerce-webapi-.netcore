@@ -14,7 +14,7 @@ public partial class User : BaseEntity
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual RefreshToken? RefreshToken { get; set; }
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual Role Role { get; set; } = null!;
 }

@@ -15,7 +15,7 @@ namespace ECommerce.Infrastructure.EntityTypeConfigurations
             builder.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-           
+
         }
     }
 }

@@ -14,8 +14,6 @@ namespace ECommerce.Infrastructure.EntityTypeConfigurations
 
             builder.Property(e => e.PermissionId).HasColumnName("PermissionID");
 
-            builder.Property(e => e.RoleId).HasColumnName("RoleId");
-
             builder.HasOne(d => d.Permission)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(d => d.PermissionId)

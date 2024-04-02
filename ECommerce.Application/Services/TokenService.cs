@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.IServices;
 using ECommerce.Application.Models.VMs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,9 +8,8 @@ using System.Text;
 
 namespace ECommerce.Application.Services
 {
-    public class TokenService(IConfiguration configuration, IOptions<JwtTokenSettings> jwtTokenSettings) : ITokenService
+    public class TokenService(IOptions<JwtTokenSettings> jwtTokenSettings) : ITokenService
     {
-        private readonly IConfiguration _configuration = configuration;
         private readonly JwtTokenSettings _jwtTokenSettings = jwtTokenSettings.Value;
 
         public string GenerateAccessToken(UserVM userVM)
@@ -53,7 +51,8 @@ namespace ECommerce.Application.Services
 
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
 
-            if (!(securityToken is JwtSecurityToken jwtSecurityToken) || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new SecurityTokenException("Invalid token");
             }

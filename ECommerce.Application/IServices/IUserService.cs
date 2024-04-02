@@ -11,5 +11,7 @@ namespace ECommerce.Application.IServices
         Task<UserVM?> GetUserByEmailAsync(string email);
 
         Task<UserVM?> LoginAsync(LoginDTO loginDTO);
+
+        Task<RefreshTokenVM?> RefreshTokenAsync(string refreshToken);
     }
 }
