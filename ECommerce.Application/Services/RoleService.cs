@@ -9,15 +9,11 @@ using System.Linq.Expressions;
 
 namespace ECommerce.Application.Services
 {
-    public class RoleService : BaseService<Role, RoleDTO, RoleVM>, IRoleService
+    public class RoleService(IRoleRepository roleRepository, IMapper mapper) 
+        : BaseService<Role, RoleDTO, RoleVM>(roleRepository, mapper), IRoleService
     {
-        private readonly IRoleRepository _roleRepository;
-        private readonly IMapper _mapper;
-        public RoleService(IRoleRepository roleRepository, IMapper mapper) : base(roleRepository, mapper)
-        {
-            _roleRepository = roleRepository;
-            _mapper = mapper;
-        }
+        private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<RoleVM>> GetFilteredPagedListAsync(int pageIndex = 1, int pageSize = 20)
         {
