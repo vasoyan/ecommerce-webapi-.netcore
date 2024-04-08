@@ -25,6 +25,8 @@ namespace ECommerce.Domain.IRepositories
         /// <param name="entity">The entity</param>
         Task<T> SaveAsync(T entity);
 
+        Task<IEnumerable<T>> SaveAllAsync(IEnumerable<T> entities);
+
         /// <summary>
         /// Updates the entity.
         /// </summary>
@@ -36,6 +38,8 @@ namespace ECommerce.Domain.IRepositories
         /// </summary>
         /// <param name="id">Identifier</param>
         Task DeleteAsync(T entity);
+
+        Task DeleteAllAsync(IEnumerable<T> entities);
 
         /// <summary>
         /// Determines whether a sequence contains any elements.

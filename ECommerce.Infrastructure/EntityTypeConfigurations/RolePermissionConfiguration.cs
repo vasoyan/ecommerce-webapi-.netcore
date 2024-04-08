@@ -17,13 +17,13 @@ namespace ECommerce.Infrastructure.EntityTypeConfigurations
             builder.HasOne(d => d.Permission)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(d => d.PermissionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK__RolePermi__Permi__29572725");
 
             builder.HasOne(d => d.Role)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK__RolePermi__RoleI__286302EC");
 
         }

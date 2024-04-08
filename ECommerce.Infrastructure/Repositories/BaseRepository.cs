@@ -41,6 +41,19 @@ namespace ECommerce.Infrastructure.Repositories
             return entity;
         }
 
+        public async Task<IEnumerable<T>> SaveAllAsync(IEnumerable<T> entities)
+        {
+            if (entities == null || !entities.Any())
+            {
+                throw new ArgumentNullException(nameof(entities), "Entities collection is null or empty.");
+            }
+
+            await _context.Set<T>().AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+
+            return entities;
+        }
+
         public async Task<T> UpdateAsync(T entity)
         {
             if (entity == null)
@@ -58,6 +71,12 @@ namespace ECommerce.Infrastructure.Repositories
         {
             _context.Remove(entity);
             //Delete operation will be made by changing entity's status in service layer.
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllAsync(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
             await _context.SaveChangesAsync();
         }
 

@@ -10,16 +10,11 @@ namespace ECommerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoleController : ControllerBase
+    public class RoleController(IRoleService roleServices, IRolePermissionService rolePermissionService, ILogger<RoleController> logger) : ControllerBase
     {
-        private readonly IRoleService _roleServices;
-        private readonly ILogger<RoleController> _logger;
-
-        public RoleController(IRoleService roleServices, ILogger<RoleController> logger)
-        {
-            _roleServices = roleServices ?? throw new ArgumentNullException(nameof(roleServices));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        private readonly IRoleService _roleServices = roleServices ?? throw new ArgumentNullException(nameof(roleServices));
+        private readonly IRolePermissionService _rolePermissionService = rolePermissionService ?? throw new ArgumentNullException(nameof(rolePermissionService));
+        private readonly ILogger<RoleController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RoleVM>>> GetAllByFilterWithPagedList(int pageIndex = 1, int pageSize = 20)
@@ -51,7 +46,7 @@ namespace ECommerce.API.Controllers
                     return BadRequest(new ApiResponse<RoleVM>(Constants.INVALID_USERID_MESSAGE, (int)HttpStatusCode.BadRequest));
                 }
 
-                var result = await _roleServices.GetByIdAsync(id);
+                var result = await _roleServices.GetRoleByIdAsync(id);
 
                 if (result != null)
                     return Ok(new ApiResponse<RoleVM>(result, (int)HttpStatusCode.OK));
@@ -76,7 +71,7 @@ namespace ECommerce.API.Controllers
                     return BadRequest(new ApiResponse<object>(Constants.MODEL_STATE_NOT_VALID, (int)HttpStatusCode.BadRequest));
                 }
 
-                var result = await _roleServices.SaveAsync(roleDTO);
+                var result = await _roleServices.SaveRolePermission(roleDTO);
 
                 if (result != null)
                     return Ok(new ApiResponse<RoleVM>(result, (int)HttpStatusCode.OK));
@@ -105,7 +100,8 @@ namespace ECommerce.API.Controllers
                 if (roleData == null)
                     return NotFound(new ApiResponse<RoleVM>(Constants.DATA_NOT_FOUND_MESSAGE, (int)HttpStatusCode.NotFound));
 
-                var result = await _roleServices.UpdateAsync(roleDTO);
+
+                var result = await _roleServices.SaveRolePermission(roleDTO);
                 if (result != null)
                     return Ok(new ApiResponse<RoleVM>(result, (int)HttpStatusCode.OK));
                 else

@@ -28,6 +28,8 @@ namespace ECommerce.Application.IServices
         /// <param name="entity">The entity</param>
         Task<TVm> SaveAsync(TDto dto);
 
+        Task<IEnumerable<TVm>> SaveAllAsync(IEnumerable<TDto> dtos);
+
         /// <summary>
         /// Updates the entity.
         /// </summary>
@@ -39,6 +41,8 @@ namespace ECommerce.Application.IServices
         /// </summary>
         /// <param name="id">Identifier</param>
         Task<bool> DeleteAsync(int id);
+
+        Task<bool> DeleteAllAsync(IEnumerable<TDto> dtos);
 
         /// <summary>
         /// Determines whether a sequence contains any elements.

@@ -2,6 +2,7 @@
 using ECommerce.Application.IServices;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace ECommerce.Application.Services
@@ -39,6 +40,20 @@ namespace ECommerce.Application.Services
             return _mapper.Map<TVm>(result);
         }
 
+        public async Task<IEnumerable<TVm>> SaveAllAsync(IEnumerable<TDto> dtos)
+        {
+            if (dtos == null || !dtos.Any())
+            {
+                return Enumerable.Empty<TVm>(); // Return empty collection if no DTOs are provided
+            }
+
+            var entities = _mapper.Map<IEnumerable<T>>(dtos);
+
+            var results = await _repository.SaveAllAsync(entities);
+
+            return _mapper.Map<IEnumerable<TVm>>(results);
+        }
+
         public async Task<TVm> UpdateAsync(TDto dto)
         {
             var entity = _mapper.Map<T>(dto);
@@ -52,6 +67,20 @@ namespace ECommerce.Application.Services
             if (entity != null)
             {
                 await _repository.DeleteAsync(entity);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteAllAsync(IEnumerable<TDto> dtos)
+        {
+            if (dtos != null && dtos.Any())
+            {
+                var entityModels = _mapper.Map<IEnumerable<T>>(dtos);
+                await _repository.DeleteAllAsync(entityModels);
                 return true;
             }
             else

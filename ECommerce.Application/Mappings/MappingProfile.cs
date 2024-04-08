@@ -15,9 +15,6 @@ namespace ECommerce.Application.Mappings
             CreateMap<CategoryDTO, Category>();
             CreateMap<Category, CategoryVM>();
 
-            CreateMap<PermissionDTO, Permission>();
-            CreateMap<Permission, PermissionVM>();
-
             CreateMap<ProductDTO, Product>();
             CreateMap<Product, ProductVM>();
 
@@ -27,7 +24,18 @@ namespace ECommerce.Application.Mappings
                 .ReverseMap();
 
             CreateMap<RoleDTO, Role>().ReverseMap();
-            CreateMap<Role, RoleVM>().ReverseMap();
+            CreateMap<Role, RoleVM>()
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.RolePermissions.Select(x => x.Permission).ToList()))
+                .ReverseMap();
+
+            CreateMap<PermissionDTO, Permission>();
+            CreateMap<Permission, PermissionVM>();
+
+            CreateMap<RolePermissionDTO, RolePermission>();
+            CreateMap<RolePermission, RolePermissionVM>()
+                 .ForMember(dest => dest.Permission, opt => opt.MapFrom(src => src.Permission))
+                 .ReverseMap();
+            CreateMap<RolePermissionVM, RolePermissionDTO>();
 
             CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<User, UserVM>().ReverseMap();
