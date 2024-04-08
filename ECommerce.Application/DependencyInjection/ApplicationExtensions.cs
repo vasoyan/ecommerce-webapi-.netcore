@@ -8,7 +8,9 @@ namespace ECommerce.Application.DependencyInjection
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<IPermissionService, PermissionService>()
+            services.AddScoped<IBrandService, BrandService>()
+                .AddScoped<ICategoryService, CategoryService>()
+                .AddScoped<IPermissionService, PermissionService>()
                 .AddScoped<IRolePermissionService, RolePermissionService>()
                 .AddScoped<IRefreshTokenService, RefreshTokenService>()
                 .AddScoped<IRoleService, RoleService>()
