@@ -10,6 +10,8 @@ namespace ECommerce.Application.IServices
 
         Task<RoleVM> GetRoleByIdAsync(int id);
 
-        Task<RoleVM?> SaveRolePermission(RoleDTO roleDTO);
+        Task<RoleVM?> SaveRolePermission(RoleDTO newRoleDTO, RoleVM? existingRoleVM = null);
+
+        Task<bool> DeleteRoleAsync(int id);
     }
 }

@@ -118,7 +118,7 @@ namespace ECommerce.API.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{id:int}")]
         public async Task<ActionResult<PermissionVM>> DeleteAsync(int id)
         {
             try

@@ -116,7 +116,7 @@ namespace ECommerce.API.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{id:int}")]
         public async Task<ActionResult<UserVM>> DeleteAsync(int id)
         {
             try

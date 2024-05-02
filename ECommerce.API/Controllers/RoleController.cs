@@ -96,12 +96,12 @@ namespace ECommerce.API.Controllers
                     return BadRequest(new ApiResponse<object>(Constants.MODEL_STATE_NOT_VALID, (int)HttpStatusCode.BadRequest));
                 }
 
-                var roleData = await _roleServices.GetByIdAsync(id);
+                var roleData = await _roleServices.GetRoleByIdAsync(id);
                 if (roleData == null)
                     return NotFound(new ApiResponse<RoleVM>(Constants.DATA_NOT_FOUND_MESSAGE, (int)HttpStatusCode.NotFound));
 
 
-                var result = await _roleServices.SaveRolePermission(roleDTO);
+                var result = await _roleServices.SaveRolePermission(roleDTO, roleData);
                 if (result != null)
                     return Ok(new ApiResponse<RoleVM>(result, (int)HttpStatusCode.OK));
                 else
@@ -114,7 +114,7 @@ namespace ECommerce.API.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{id:int}")]
         public async Task<ActionResult<RoleVM>> DeleteAsync(int id)
         {
             try
@@ -125,7 +125,7 @@ namespace ECommerce.API.Controllers
                     return BadRequest(new ApiResponse<RoleVM>(Constants.INVALID_USERID_MESSAGE, (int)HttpStatusCode.BadRequest));
                 }
 
-                var result = await _roleServices.DeleteAsync(id);
+                var result = await _roleServices.DeleteRoleAsync(id);
                 if (result)
                     return Ok(new ApiResponse<string>(Constants.DELETE_MESSAGE, (int)HttpStatusCode.OK));
                 else
