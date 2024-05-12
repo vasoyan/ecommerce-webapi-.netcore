@@ -17,7 +17,7 @@ This application follows the principles of Clean Architecture, where dependencie
 - Response Handling
 
 
-## ECommerce.API
+## API Project
 This is the presentation layer of the application. It contains the API controllers which handle HTTP requests and responses, and the DependencyInjection folder suggests that this layer is responsible for setting up dependency injection.
 
 - Common: This folder contains a file named Constants.cs, which stores constant values used in API project.
@@ -26,7 +26,7 @@ This is the presentation layer of the application. It contains the API controlle
 - appsettings.json: This file typically contains configuration settings for the application.
 - Program.cs: This is a C# file that contains the main entry point for the application.
 
-## ECommerce.Application
+## Application Project
 This layer contains application-specific logic and interfaces (IServices). It also contains DTOs (Data Transfer Objects), VMs (View Models), and service implementations. The Mappings folder contains object mapping configurations, using a library like AutoMapper.
 
 - Dependencies: `ApplicationExtensions.cs` file contains the dependencies for this Application layer of Application.IServices and Application.Services. 
@@ -36,13 +36,13 @@ This layer contains application-specific logic and interfaces (IServices). It al
 - Helpers: This folder contains helper classes that provide utility functions used across the application. The ApiResponse.cs file might be a class that standardizes the format of responses sent from the API.
 - Services: This folder contains the concrete implementations of the service interfaces defined in the IServices folder. The BaseService.cs file is a generic service that contains methods for common operations. The other files in this folder (like BrandService.cs, CategoryService.cs, etc.) are services for specific entities, inheriting from the base service and possibly adding entity-specific operations.
 
-## ECommerce.Domain
+## Domain Project
 This is the domain layer of the application. It contains business entities and repository interfaces (IRepositories).
 
 - Entities: This folder contains the business entities of the application. These are classes that represent the various business objects that the application will be dealing with.
 - Repositories: This folder contains interfaces for the repositories. These interfaces define the operations that can be performed on the entities. For example, the IBaseRepository interface methods like GetAllAsync, GetByIdAsync, SaveAsync, and UpdateAsync. These methods are used to perform common database operations. There are also other repository interfaces, which are specific to certain entities.
 
-## ECommerce.Infrastructure
+## Infrastructure Project
 This layer contains the actual implementations of the repositories defined in the Domain layer. It also contains the data context for interacting with the database and EntityTypeConfigurations which could be for configuring entity relationships and properties.
 
 - Dependencies: file contains the dependencies for this Infrastructure layer of Domain.IRepositories and Infrastructure.Repositories.
